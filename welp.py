@@ -14,7 +14,7 @@ picklelib.save_pickle('structure.pickle', net_structure)
 
 # load the net structure for test
 net_structure = picklelib.get_pickle_info('structure.pickle')
-print(net_structure)
+# print(net_structure)
 
 class DVR_node:
 
@@ -40,13 +40,13 @@ class DVR_node:
         self.distances[node] = distance
         return(self.distances)
 
-DVR_HOME_NODE = DVR_node(HOME_NODE)
-# add to visited test
-print(DVR_HOME_NODE.add_visited('B', 50))
-# add nodeslist test
-print(DVR_HOME_NODE.add_nodeslist('B'))
-# add distances test
-print(DVR_HOME_NODE.add_distances('B', 50))
-# modify distances test
-print(DVR_HOME_NODE.modify_distances('B', 100))
+# DVR_HOME_NODE = DVR_node(HOME_NODE)
+# # add to visited test
+# print(DVR_HOME_NODE.add_visited('B', 50))
+# # add nodeslist test
+# print(DVR_HOME_NODE.add_nodeslist('B'))
+# # add distances test
+# print(DVR_HOME_NODE.add_distances('B', 50))
+# # modify distances test
+# print(DVR_HOME_NODE.modify_distances('B', 100))
 
