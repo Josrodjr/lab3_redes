@@ -1,9 +1,20 @@
-
-# distances = {}
-# distances['a'] = 1
-# print(distances)
+import picklelib
 
 HOME_NODE = 'A'
+
+net_structure = {
+    'A': {'B': 2, 'C': 3},
+    'B': {'A': 2, 'D': 4},
+    'C': {'A': 3},
+    'D': {'B': 4}
+}
+
+# save the net structure so it can be loaded easily
+picklelib.save_pickle('structure.pickle', net_structure)
+
+# load the net structure for test
+net_structure = picklelib.get_pickle_info('structure.pickle')
+print(net_structure)
 
 class DVR_node:
 
