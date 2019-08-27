@@ -1,9 +1,9 @@
-import welp
+import DVR_node
 import picklelib
 
 HOME_NODE = 'A'
 
-DVR_HOME_NODE = welp.DVR_node(HOME_NODE)
+DVR_HOME_NODE = DVR_node.DVR_node(HOME_NODE)
 
 # get ONLY the info we need for this node
 net_structure = picklelib.get_pickle_info('structure.pickle')
