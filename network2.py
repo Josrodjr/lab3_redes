@@ -81,13 +81,39 @@ class myBot(sleekxmpp.ClientXMPP):
 
             # check if the actual node is the destination
             if actual_node == json_info['n_destino']:
-                print("llego lol")
+                # return a success to the generator
+                message_dict = {
+                    "n_fuente": json_info['n_destino'],
+                    "current": actual_node,
+                    "n_destino": json_info['n_fuente'],
+                    "saltos": json_info['saltos']*2,
+                    "distancia": json_info['distancia']*2,
+                    "lista_nodos": json_info['lista_nodos'] + actual_node,
+                    "mensaje": "FLOODED"
+                }
+                message = json.dumps(message_dict) + 'STATUS: FLOODED'
+                # send message
+                self.send_message(mto='pepa_'+json_info['n_fuente']+'@alumchat.xyz', mbody = message, mtype = 'chat')
 
             for neighbor in net_structure[actual_node]:
-                # forward message
-                message = msg['body']
-                # send message
-                self.send_message(mto='pepa_'+neighbor+'@alumchat.xyz', mbody = message, mtype = 'chat')
+                # check if node already passed here
+                nodes_traveled = [x.strip() for x in json_info['lista_nodos'].split(',')]
+                if neighbor not in nodes_traveled:
+                    # forward message
+                    
+                    message_dict = {
+                        "n_fuente": json_info['n_fuente'],
+                        "current": neighbor,
+                        "n_destino": json_info['n_destino'],
+                        "saltos": json_info['saltos'] + 1,
+                        "distancia": json_info['distancia'] + 1,
+                        "lista_nodos": json_info['lista_nodos'] +", "+ actual_node,
+                        "mensaje": "welp"
+                    }
+                    message = json.dumps(message_dict)
+                    # send message
+                    self.send_message(mto='pepa_'+neighbor+'@alumchat.xyz', mbody = message, mtype = 'chat')
+                # self.send_message(mto='pepa_'+neighbor+'@alumchat.xyz', mbody = message, mtype = 'chat')
 
 
         except:

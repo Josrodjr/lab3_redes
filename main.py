@@ -1,5 +1,12 @@
 import picklelib # library for pickle handling
-import network # library for the network usage
+
+print("1 for flooding, 2 for link state routing")
+choice = input()
+if choice == '1':
+    import network2 as network
+else:
+    import network # library for the network usage
+
 import DVR_node # library for the node abstraction
 # import djstra # library for djistra link state routing
 import json
