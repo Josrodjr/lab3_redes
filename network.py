@@ -6,7 +6,8 @@ import logging
 import sys
 import sleekxmpp
 from sleekxmpp.exceptions import IqError, IqTimeout
-
+import json
+import picklelib
 
 # variables
 USER = 'test'
@@ -67,8 +68,55 @@ class myBot(sleekxmpp.ClientXMPP):
         self.send_message(mto=self.recipient_msg, mbody=self.message_info)
     
     def recv_message(self, msg):
-        print(str(msg['from']) + ": " + str(msg['subject']) + "\n")
-        print(str(msg['body']) + "\n")
+        # try and parse to json the message info
+        # print(msg['to'])
+        try:
+            json_info = json.loads(msg['body'])
+            # print(json_info['n_fuente'])
+
+            actual_node = json_info['current']
+            print("este nodo ",actual_node)
+
+            # get the info for this node from net
+            net_structure = picklelib.get_pickle_info('structure.pickle')
+            print(net_structure[actual_node])
+
+            # check if any of this nodes neighbor is the node we are looking for
+            for neighbor in net_structure[actual_node]:
+                # print(neighbor)
+                if neighbor != json_info['n_fuente']:
+                    # send a modified message searching for the node
+                    message_dict = {
+                        "n_fuente": json_info['n_fuente'],
+                        "current": neighbor,
+                        "n_destino": json_info['n_destino'],
+                        "saltos": json_info['saltos'] + 1,
+                        "distancia": json_info['distancia'] + 1,
+                        "lista_nodos": json_info['lista_nodos'] +", "+ actual_node,
+                        "mensaje": "welp"
+                    }
+                    message = json.dumps(message_dict)
+                    # send message
+                    self.send_message(mto='pepa_'+neighbor+'@alumchat.xyz', mbody = message, mtype = 'chat')
+                    # self.send_message(mto='pepa_a@alumchat.xyz', mbody = 'TEST', mtype = 'chat')
+            if actual_node == json_info['n_destino']:
+                # return a success to the generator
+                message_dict = {
+                    "n_fuente": json_info['n_destino'],
+                    "current": actual_node,
+                    "n_destino": json_info['n_fuente'],
+                    "saltos": json_info['saltos']*2,
+                    "distancia": json_info['distancia']*2,
+                    "lista_nodos": json_info['lista_nodos'],
+                    "mensaje": "welp"
+                }
+                message = json.dumps(message_dict) + 'RUINED'
+                # send message
+                self.send_message(mto='pepa_'+json_info['n_fuente']+'@alumchat.xyz', mbody = message, mtype = 'chat')
+
+        except:
+            print(str(msg['from']) + ": " + str(msg['subject']) + "\n")
+            print(str(msg['body']) + "\n")
 
     def dissconect(self):
         self.disconnect(wait=True)

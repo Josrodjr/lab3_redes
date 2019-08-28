@@ -89,17 +89,19 @@ time.sleep(6)
 while(True):
     destino(HOME_NODE)
     obj = input().upper()
-    # design a custom message that we can parse later
-    message_dict = {
-            "n_fuente": HOME_NODE,
-            "n_destino": obj,
-            "saltos": 0,
-            "distancia": 0,
-            "lista_nodos": 0,
-            "mensaje": "welp"
-        }
-    message = json.dumps(message_dict)
+    
     # iterate over the known visited nodes and send them a message to the objective 
     for target in DVR_HOME_NODE.visited:
         if HOME_NODE != target:
+            # design a custom message that we can parse later
+            message_dict = {
+                    "n_fuente": HOME_NODE,
+                    "current": target,
+                    "n_destino": obj,
+                    "saltos": 0,
+                    "distancia": 0,
+                    "lista_nodos": " ",
+                    "mensaje": "welp"
+                }
+            message = json.dumps(message_dict)
             network.send_message(mto='pepa_'+target+'@alumchat.xyz', mbody = message, mtype = 'chat')
