@@ -2,6 +2,9 @@ import picklelib # library for pickle handling
 import network # library for the network usage
 import DVR_node # library for the node abstraction
 # import djstra # library for djistra link state routing
+import json
+import sys
+import time
 
 net_structure = {
     'A': {'B': 2, 'C': 3},
@@ -29,30 +32,74 @@ user_pwd = picklelib.get_pickle_info('user_pwd.pickle')
 
 # for each fo the values in the user dictionary create a network class instance
 
-instanced = []
+def menu():
+    for i in user_pwd:
+        print("Press "+ i[5:6] + " Use: " + i + " Node: " + str(i[5:6]))
+    return 0
 
-for value in user_pwd:
-    # instance
-    print('name '+ value, 'pwd ' + user_pwd[value])
-    value = network.myBot(value+'@alumchat.xyz', user_pwd[value])
-    value.register_plugin('xep_0030') # Service Discovery        
-    value.register_plugin('xep_0004') # Data forms
-    value.register_plugin('xep_0066') # Out-of-band Data
-    value.register_plugin('xep_0077') # In-band Registration FORCED
-    value.register_plugin('xep_0199') # value Ping
-    value.register_plugin('xep_0045') # Annotations
+def destino(home):
+    for i in user_pwd:
+        if home != str(i[5:6]):
+            print("Press "+ i[5:6] + " To message " + str(i[5:6]))
+    return 0
 
-    if value.connect(("alumchat.xyz", 5222)):
-        print("CONNECTED TO SERVER")
-        value.process()
+
+menu()
+value = input()  
+HOME_NODE = value.upper()
+DVR_HOME_NODE = DVR_node.DVR_node(HOME_NODE)
+
+try:
+    USERNAME = 'pepa_'+HOME_NODE
+    PASSWORD = user_pwd[USERNAME]
+except:
+    print("INVALID LETTER")
+    sys.exit()
+
+# do the chat stuff
+# register to net
+network = network.myBot(USERNAME+'@alumchat.xyz', PASSWORD)
+network.register_plugin('xep_0030') # Service Discovery        
+network.register_plugin('xep_0004') # Data forms
+network.register_plugin('xep_0066') # Out-of-band Data
+network.register_plugin('xep_0077') # In-band Registration FORCED
+network.register_plugin('xep_0199') # network Ping
+network.register_plugin('xep_0045') # Annotations
+
+
+if network.connect(("alumchat.xyz", 5222)):
+    print("CONNECTED TO SERVER")
+    network.process()
                     
-    else:
-        print("COULD NOT CONNECT TO SERVER")    
+else:
+    print("COULD NOT CONNECT TO SERVER")    
 
-    instanced.append(value)
+# create a DVR node instance
 
-# try and send a message to a previously registered user found in user_pwd
+# create a new dictionary with the known paths and costs
+for node in net_structure[HOME_NODE]:
+    DVR_HOME_NODE.add_distances(node, net_structure[HOME_NODE][node])
 
-for value in instanced:
-    # print(value)
-    value.send_message(mto='pepa_A'+'@alumchat.xyz', mbody = 'test', mtype = 'chat')
+    # add the requested nodes to list of visited
+    DVR_HOME_NODE.add_visited(node, net_structure[HOME_NODE][node])
+
+
+time.sleep(6)
+
+while(True):
+    destino(HOME_NODE)
+    obj = input().upper()
+    # design a custom message that we can parse later
+    message_dict = {
+            "n_fuente": HOME_NODE,
+            "n_destino": obj,
+            "saltos": 0,
+            "distancia": 0,
+            "lista_nodos": 0,
+            "mensaje": "welp"
+        }
+    message = json.dumps(message_dict)
+    # iterate over the known visited nodes and send them a message to the objective 
+    for target in DVR_HOME_NODE.visited:
+        if HOME_NODE != target:
+            network.send_message(mto='pepa_'+target+'@alumchat.xyz', mbody = message, mtype = 'chat')
