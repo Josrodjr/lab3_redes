@@ -86,19 +86,23 @@ class myBot(sleekxmpp.ClientXMPP):
                 # print(neighbor)
                 if neighbor != json_info['n_fuente']:
                     # send a modified message searching for the node
-                    message_dict = {
-                        "n_fuente": json_info['n_fuente'],
-                        "current": neighbor,
-                        "n_destino": json_info['n_destino'],
-                        "saltos": json_info['saltos'] + 1,
-                        "distancia": json_info['distancia'] + 1,
-                        "lista_nodos": json_info['lista_nodos'] +", "+ actual_node,
-                        "mensaje": "welp"
-                    }
-                    message = json.dumps(message_dict)
-                    # send message
-                    self.send_message(mto='pepa_'+neighbor+'@alumchat.xyz', mbody = message, mtype = 'chat')
-                    # self.send_message(mto='pepa_a@alumchat.xyz', mbody = 'TEST', mtype = 'chat')
+
+                    # check if node already passed here
+                    nodes_traveled = [x.strip() for x in json_info['lista_nodos'].split(',')]
+                    if neighbor not in nodes_traveled:
+                        message_dict = {
+                            "n_fuente": json_info['n_fuente'],
+                            "current": neighbor,
+                            "n_destino": json_info['n_destino'],
+                            "saltos": json_info['saltos'] + 1,
+                            "distancia": json_info['distancia'] + 1,
+                            "lista_nodos": json_info['lista_nodos'] +", "+ actual_node,
+                            "mensaje": "welp"
+                        }
+                        message = json.dumps(message_dict)
+                        # send message
+                        self.send_message(mto='pepa_'+neighbor+'@alumchat.xyz', mbody = message, mtype = 'chat')
+                        # self.send_message(mto='pepa_a@alumchat.xyz', mbody = 'TEST', mtype = 'chat')
             if actual_node == json_info['n_destino']:
                 # return a success to the generator
                 message_dict = {
@@ -107,12 +111,13 @@ class myBot(sleekxmpp.ClientXMPP):
                     "n_destino": json_info['n_fuente'],
                     "saltos": json_info['saltos']*2,
                     "distancia": json_info['distancia']*2,
-                    "lista_nodos": json_info['lista_nodos'],
-                    "mensaje": "welp"
+                    "lista_nodos": json_info['lista_nodos'] + actual_node,
+                    "mensaje": "COMPLETED"
                 }
-                message = json.dumps(message_dict) + 'RUINED'
+                message = json.dumps(message_dict) + 'STATUS: COMPLETED'
                 # send message
                 self.send_message(mto='pepa_'+json_info['n_fuente']+'@alumchat.xyz', mbody = message, mtype = 'chat')
+                # print
 
         except:
             print(str(msg['from']) + ": " + str(msg['subject']) + "\n")
