@@ -16,15 +16,19 @@ import time
 net_structure = {
     'A': {'B': 2, 'C': 3},
     'B': {'A': 2, 'D': 4},
-    'C': {'A': 3},
-    'D': {'B': 4}
+    'C': {'A': 3, 'F': 4},
+    'D': {'B': 4, 'F': 2, 'E': 1},
+    'E': {'D': 1},
+    'F': {'C': 4, 'D': 2}
 }
 
 user_pwd = {
         'pepa_A': 'pepapls1',
         'pepa_B': 'pepapls2',
         'pepa_C': 'pepapls3',
-        'pepa_D': 'pepapls4'
+        'pepa_D': 'pepapls4',
+        'pepa_E': 'pepapls5',
+        'pepa_F': 'pepapls6'
 }
 
 # save the net structure so it can be loaded easily

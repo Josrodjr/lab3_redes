@@ -95,7 +95,7 @@ class myBot(sleekxmpp.ClientXMPP):
                             "current": neighbor,
                             "n_destino": json_info['n_destino'],
                             "saltos": json_info['saltos'] + 1,
-                            "distancia": json_info['distancia'] + 1,
+                            "distancia": json_info['distancia'] + net_structure[actual_node][neighbor],
                             "lista_nodos": json_info['lista_nodos'] +", "+ actual_node,
                             "mensaje": "welp"
                         }
@@ -110,7 +110,7 @@ class myBot(sleekxmpp.ClientXMPP):
                     "current": actual_node,
                     "n_destino": json_info['n_fuente'],
                     "saltos": json_info['saltos']*2,
-                    "distancia": json_info['distancia']*2,
+                    "distancia": json_info['distancia'] + net_structure[actual_node][neighbor],
                     "lista_nodos": json_info['lista_nodos'] + actual_node,
                     "mensaje": "COMPLETED"
                 }
@@ -118,6 +118,7 @@ class myBot(sleekxmpp.ClientXMPP):
                 # send message
                 self.send_message(mto='pepa_'+json_info['n_fuente']+'@alumchat.xyz', mbody = message, mtype = 'chat')
                 # print
+                print(message)
 
         except:
             print(str(msg['from']) + ": " + str(msg['subject']) + "\n")
